@@ -1,0 +1,641 @@
+<!doctype html>
+<html lang="sr-Latn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Upitnik Ćatić Gambino</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600&display=swap">
+<style>
+  /* Layout: one phone-first column, question numbers in a narrow left rail, save bar pinned to the bottom. */
+  :root {
+    color-scheme: light;
+    --ink: #10303a;
+    --muted: #4f6b75;
+    --ground: #eff4f5;
+    --sheet: #ffffff;
+    --line: #c9d8dc;
+    --brand: #40a1b8;
+    --brand-deep: #176579;
+    --brand-wash: #e3f2f6;
+    --call: #8f4600;
+    --call-wash: #fdf0e1;
+    --error: #a3261b;
+    --body: "Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --display: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font: 400 1.0625rem/1.5 var(--body);
+  }
+  .page {
+    max-width: 44rem;
+    margin: 0 auto;
+    padding-block: 1.5rem 7rem;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  h1, h2 { font-family: var(--display); font-weight: 600; line-height: 1.1; margin: 0; text-wrap: balance; }
+  h1 { font-size: 2.5rem; }
+  h2 { font-size: 1.75rem; }
+  .masthead { display: flex; align-items: center; gap: 1rem; }
+  .masthead img { width: 4.5rem; height: auto; flex: none; }
+  .brand-name { color: var(--brand-deep); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; font-size: .875rem; }
+  .intro { margin: 1.25rem 0 0; max-width: 65ch; display: grid; gap: .75rem; }
+  .intro p { margin: 0; }
+  .note { color: var(--muted); font-size: .9375rem; }
+
+  .questions { margin-top: 2rem; background: var(--sheet); border: 1px solid var(--line); border-radius: 6px; }
+  .section-title { margin: 2.5rem 0 0; }
+  .question {
+    display: grid;
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    column-gap: .5rem;
+    padding: 1.25rem 1rem;
+    border-top: 1px solid var(--line);
+    scroll-margin-top: 1rem;
+  }
+  .question:first-child { border-top: 0; }
+  .num { font: 600 1.75rem/1.1 var(--display); color: var(--brand-deep); font-variant-numeric: tabular-nums; }
+  .body { min-width: 0; display: grid; gap: .75rem; }
+  .text { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+  .hint { margin: -.5rem 0 0; color: var(--muted); font-size: .9375rem; overflow-wrap: anywhere; }
+  .logo-preview { width: 9rem; height: auto; padding: .75rem; background: var(--sheet); border: 1px solid var(--line); border-radius: 6px; }
+  .facts { margin: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .125rem .875rem; }
+  .facts dt { color: var(--muted); }
+  .facts dd { margin: 0; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+
+  fieldset { border: 0; margin: 0; padding: 0; min-width: 0; display: grid; gap: .375rem; }
+  .option {
+    display: flex;
+    align-items: flex-start;
+    gap: .625rem;
+    min-height: 2.75rem;
+    padding: .5625rem .75rem;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .option:hover { border-color: var(--brand); }
+  .option:has(input:checked) { border-color: var(--brand-deep); background: var(--brand-wash); }
+  .option span { min-width: 0; overflow-wrap: anywhere; }
+  input[type="checkbox"], input[type="radio"] {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin: .125rem 0 0;
+    flex: none;
+    accent-color: var(--brand-deep);
+  }
+  textarea {
+    display: block;
+    width: 100%;
+    padding: .625rem .75rem;
+    border: 1px solid var(--muted);
+    border-radius: 6px;
+    background: var(--sheet);
+    color: var(--ink);
+    font: inherit;
+    resize: vertical;
+  }
+  textarea::placeholder { color: var(--muted); }
+  :focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
+
+  .call {
+    display: flex;
+    align-items: flex-start;
+    gap: .625rem;
+    padding-top: .625rem;
+    border-top: 1px dashed var(--line);
+    color: var(--call);
+    cursor: pointer;
+  }
+  .call input { accent-color: var(--call); }
+  .call b { font-weight: 600; }
+  .call small { display: block; font-size: .875rem; color: var(--muted); }
+
+  .savebar {
+    position: fixed;
+    inset: auto 0 0;
+    background: var(--sheet);
+    border-top: 1px solid var(--line);
+    padding-block: .625rem calc(.625rem + env(safe-area-inset-bottom, 0px));
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  .savebar-inner { max-width: 44rem; margin: 0 auto; display: flex; align-items: center; gap: 1rem; }
+  .progress { flex: 1; min-width: 0; font-size: .9375rem; font-variant-numeric: tabular-nums; }
+  .progress-track { display: block; height: 4px; margin-top: .25rem; background: var(--line); border-radius: 2px; overflow: hidden; }
+  .progress-fill { display: block; height: 100%; background: var(--brand-deep); }
+
+  button, .button {
+    min-height: 2.75rem;
+    padding: .5rem 1rem;
+    border: 1px solid var(--brand-deep);
+    border-radius: 6px;
+    background: var(--brand-deep);
+    color: #ffffff;
+    font: 600 1rem/1.2 var(--body);
+    text-decoration: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  button.secondary { background: var(--sheet); color: var(--brand-deep); }
+  button.inline-link {
+    min-height: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    font-weight: 600;
+    text-decoration: underline;
+  }
+
+  dialog {
+    width: min(34rem, calc(100vw - 32px));
+    padding: 1.25rem;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--sheet);
+    color: var(--ink);
+  }
+  dialog::backdrop { background: rgb(16 48 58 / .55); }
+  .dialog-body { display: grid; gap: .875rem; }
+  .dialog-body p { margin: 0; }
+  .actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+  .link-box { font-size: .875rem; line-height: 1.35; overflow-wrap: anywhere; }
+
+  .summary { margin-top: 1.25rem; display: grid; gap: .5rem; }
+  .summary p { margin: 0; }
+  .call-summary { padding: .75rem; border-radius: 6px; background: var(--call-wash); color: var(--call); }
+  .answer { margin: 0; padding: 0; list-style: none; display: grid; gap: .25rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .answer li { padding: .375rem .625rem; border-radius: 6px; background: var(--brand-wash); }
+  .answer .other-label { font-weight: 600; }
+  .empty { margin: 0; color: var(--muted); font-style: italic; }
+  .call-flag { justify-self: start; padding: .125rem .5rem; border-radius: 6px; background: var(--call-wash); color: var(--call); font-weight: 600; font-size: .9375rem; }
+  .error-box { margin-top: 1.5rem; padding: 1rem; border: 1px solid var(--error); border-radius: 6px; background: var(--sheet); display: grid; gap: .75rem; justify-items: start; }
+  .error-box h2 { color: var(--error); }
+  .error-box p { margin: 0; }
+
+  @media (min-width: 34rem) {
+    .question { grid-template-columns: 3rem minmax(0, 1fr); padding: 1.5rem; }
+    .num { font-size: 2.25rem; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .progress-fill { transition: width .2s ease; }
+  }
+</style>
+</head>
+<body>
+<main class="page" id="app"></main>
+
+<div class="savebar" id="savebar" hidden>
+  <div class="savebar-inner">
+    <div class="progress" aria-live="polite">
+      <span id="progress-text"></span>
+      <span class="progress-track"><span class="progress-fill" id="progress-fill"></span></span>
+    </div>
+    <button type="button" id="save-button">Sačuvaj odgovore</button>
+  </div>
+</div>
+
+<dialog id="save-dialog" aria-labelledby="save-title">
+  <div class="dialog-body">
+    <h2 id="save-title">Odgovori su u ovom linku</h2>
+    <p>Pošalji mi link na Viber ili WhatsApp. Dok ga ne pošalješ, ne mogu da vidim tvoje odgovore.</p>
+    <p id="missing-note" class="note"></p>
+    <label for="result-link" class="note">Tvoj link:</label>
+    <textarea id="result-link" class="link-box" rows="4" readonly></textarea>
+    <div class="actions">
+      <button type="button" id="copy-button">Kopiraj link</button>
+      <button type="button" id="share-button" class="secondary" hidden>Pošalji</button>
+      <button type="button" id="close-button" class="secondary">Nazad na pitanja</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+  const DRAFT_KEY = 'cg-upitnik-draft';
+  const HASH_PREFIX = '#o=';
+  // Last character of every packed link. If it is missing, a messenger cut the link short.
+  const END_MARK = 'E';
+  const OTHER = 'Drugo';
+  const CALL_HINT = 'Pitanje mi nije jasno ili mi je lakše da odgovorim usmeno';
+
+  // `opts` strings may contain markup, so they stay in this file and answers never pass through innerHTML.
+  const MAIN_QUESTIONS = [
+    { id: '1', type: 'check', text: 'Koje sve usluge radiš, a koje NE?', hint: 'Izaberi usluge koje radiš. Ako postoji nešto što nije navedeno, izaberi "Drugo" i upiši.',
+      opts: ['Izbacivanje i odvoz šuta', 'Čišćenje prostora', 'Sve vrste selidbi', 'Sečenje betona', 'Demontaža - <strong>Vraćanje objekata u sivu fazu</strong>', 'Skidanje podova, laminata, parketa, keramike, skidanje stolarije i starih instalacija', 'Selidbe firmi, kancelarijskog nameštaja', 'Organizovan odvoz šuta na deponiju', OTHER] },
+    { id: '2', type: 'open', text: 'Koliko imaš vozila i radnika na raspolaganju?', hint: 'Upiši odgovor.' },
+    { id: '3', type: 'check', text: 'Kako te ljudi pronalaze?',
+      opts: ['Društvene mreže', 'Preporuke tvojih mušterija', 'Preporuke kolega', 'Oglasi', OTHER] },
+    { id: '4', type: 'open', text: 'Ako si na prethodno pitanje izabrao više od jednog odgovora, ovde napiši kako te ljudi pronalaze u procentima.', hint: 'Na primer: 70% mušterija sa kojima ugovorim posao dolazi mi od preporuke ljudi sa kojima sam već radio.' },
+    { id: '5', type: 'open', text: 'Od svih usluga koje nudiš, da li postoji jedna ili dve koje čine 80% tvog ukupnog posla?', hint: 'Ovde upiši uslugu i %. Na primer: Demontaže stanova - 70%, Selidbe - 20%, Sve ostalo - 10%' },
+    { id: '6', type: 'open', text: 'Ako prihvataš poslove van Beograda, sa koje lokacije te najviše angažuju?', hint: 'Ako poslove van Beograda prihvataš baš retko, napiši to ispod i navedi razlog zašto.' },
+    { id: '7', type: 'open', text: 'Ako prihvataš poslove van Beograda, koliko to čini % od tvog sveukupnog ugovorenog posla?', hint: 'Na primer: 95% svih poslova koje ugovorim su u Beogradu i +- 70km u okolini, a samo 5% van toga.' },
+    { id: '8', type: 'check', text: 'Šta koristiš za zaštitu stvari prilikom transporta?', hint: 'Izaberi više ponuđenih odgovora. Ako koristiš nešto dodatno, izaberi "Drugo" i upiši šta je to.',
+      opts: ['Streč folija', 'Pucketava-vazdušasta folija', 'Karton', 'Stiropor', 'Stirodur', OTHER] },
+    { id: '9', type: 'open', text: 'Šta ako se nešto ošteti prilikom utovara, transporta ili tokom rušenja? Kako se to rešava?', hint: 'Ovo je važno da bismo otklonili sumnju i stekli poverenje ljudi.' },
+    { id: '10', type: 'radio', text: 'Da li je izlazak na teren radi procene posla besplatan?',
+      opts: ['Da', 'Ne', OTHER] },
+    { id: '11', type: 'radio', text: 'Kako te ljudi najčešće kontaktiraju?',
+      opts: ['Poziv na telefon', 'Poruke na društvenim mrežama', 'Poruke na Viber-u', 'Poruke na WhatsApp-u', 'Email', OTHER] },
+    { id: '12', type: 'radio', text: 'Da li posao ugovaraš nakon što izađeš na teren i proceniš situaciju ili je moguće ugovoriti posao preko Viber-a, tako što ti opišu posao, pošalju slike ili video?',
+      opts: ['Ne. Uvek pre dogovora moram da izađem na teren da se uverim kakvo je stanje.', 'Da. Moguće je preko Viber-a ugovoriti posao. Ali ako ne mogu da napravim dobru procenu, onda moram da izađem na teren.'] },
+    { id: '13', type: 'open', text: 'Poslove koje si do sada radio, kakav je odnos Fizička lica/Firme?', hint: 'Na primer: Fizička lica - 60%, Firme - 40%' },
+    { id: '14', type: 'check', text: 'Firme sa kojima si radio, kako su došle do tebe?',
+      opts: ['Našle su broj na internetu (Društvene mreže, oglasi i sl.)', 'Preporuka kolega sa kojima radim', 'Preporuka mušterija', OTHER] },
+    { id: '15', type: 'check', text: 'Kako su te firme kontaktirale?',
+      opts: ['Poziv na telefon', 'Viber', 'Email', OTHER] },
+    { id: '16', type: 'open', text: 'Navedi spisak svih firmi sa kojima si radio.', hint: 'Ovo je važno da stavimo na sajt kao referencu - kao društveni dokaz.' },
+    { id: '17', type: 'open', text: 'Šta te ljudi najčešće pitaju pre nego što ugovorite posao?' },
+    { id: '18', type: 'open', text: 'Da li mogu ovi podaci da idu na sajt?',
+      facts: [['PIB', '111710224'], ['MB', '65610884'], ['Adresa', 'Surčin, Beograd 11271'], ['Kontakt telefon', '0656859261'], ['Email', 'darkocatic93@gmail.com']] },
+    { id: '19', type: 'radio', text: 'Da li je okej da koristim ovaj logo?', image: true,
+      opts: ['Da', 'Ne', OTHER] },
+    { id: '20', type: 'radio', text: 'Da li želiš da domen sajta bude: caticgambino.rs ili nešto drugo?',
+      opts: ['Može caticgambino.rs', OTHER] },
+    { id: '22', type: 'open', text: 'Koliko godina posluješ i koliko si otprilike poslova završio?', hint: 'To su brojke za sajt koje grade poverenje, pa da ih ne izmišljamo.' },
+  ];
+
+  const EXTRA_QUESTIONS = [
+    { id: 'd1', type: 'open', text: 'Ako imaš slike sa poslova koje si radio, a znaš na kojim lokacijama si ih radio, možeš ih ubaciti na Google Drive i podeliti sa nikolaercic5@gmail.com', hint: 'Bilo bi dobro da sve bude po folderima. Na primer: Folder "Novi Beograd" i u njega dodaš sve slike sa poslova na Novom Beogradu.' },
+    { id: 'd2', type: 'open', text: 'Ako imaš utiske mušterija bilo bi dobro da ih skrinuješ, pa da i to dodaš na Google Drive i podeliš sa nikolaercic5@gmail.com' },
+    { id: 'd3', type: 'radio', text: 'Google Business Profil i recenzije: Profil firme na Google mapama - važno za lokalne pretrage. Da li želiš da napravimo Google Business nalog, da mogu ljudi da ostave ocenu i da se pojavljuješ na Google Mapama?',
+      opts: ['Da', 'Ne', 'Za sad ne, videćemo kasnije', OTHER] },
+  ];
+
+  // Numbers shown to the client run without gaps, independent of the stored ids.
+  MAIN_QUESTIONS.forEach((q, i) => { q.label = String(i + 1); q.ref = String(i + 1); });
+  EXTRA_QUESTIONS.forEach((q, i) => { q.label = String(i + 1); q.ref = 'dodatno ' + (i + 1); });
+  const ALL_QUESTIONS = [...MAIN_QUESTIONS, ...EXTRA_QUESTIONS];
+
+  const app = document.getElementById('app');
+  const saveBar = document.getElementById('savebar');
+  const saveDialog = document.getElementById('save-dialog');
+  const resultLink = document.getElementById('result-link');
+  const copyButton = document.getElementById('copy-button');
+  const shareButton = document.getElementById('share-button');
+
+  let answers = {};
+
+  function el(tag, props = {}, ...children) {
+    const node = document.createElement(tag);
+    Object.entries(props).forEach(([key, value]) => {
+      if (key === 'class') node.className = value;
+      else if (key === 'html') node.innerHTML = value;
+      else if (key in node) node[key] = value;
+      else node.setAttribute(key, value);
+    });
+    node.append(...children.filter(Boolean));
+    return node;
+  }
+
+  /* Answer state */
+
+  function answerFor(id) {
+    if (!answers[id]) answers[id] = {};
+    return answers[id];
+  }
+
+  function otherIndex(q) {
+    return q.opts ? q.opts.indexOf(OTHER) : -1;
+  }
+
+  // Keeps only what a question can actually hold. Also used on data read from a link, which anyone could edit.
+  function cleanAnswers(raw) {
+    const clean = {};
+    if (!raw || typeof raw !== 'object') return clean;
+    ALL_QUESTIONS.forEach((q) => {
+      const source = raw[q.id];
+      if (!source || typeof source !== 'object') return;
+      const entry = {};
+      if (q.opts && Array.isArray(source.s)) {
+        const picked = [...new Set(source.s)].filter((i) => Number.isInteger(i) && i >= 0 && i < q.opts.length);
+        const selection = q.type === 'radio' ? picked.slice(0, 1) : picked.sort((a, b) => a - b);
+        if (selection.length) entry.s = selection;
+        if (selection.includes(otherIndex(q)) && typeof source.d === 'string' && source.d.trim()) entry.d = source.d.trim();
+      }
+      if (q.type === 'open' && typeof source.t === 'string' && source.t.trim()) entry.t = source.t.trim();
+      if (source.p === 1 || source.p === true) entry.p = 1;
+      if (Object.keys(entry).length) clean[q.id] = entry;
+    });
+    return clean;
+  }
+
+  function isAnswered(entry) {
+    return Boolean(entry && (entry.s || entry.t || entry.p));
+  }
+
+  function refList(questions) {
+    return questions.map((q) => q.ref).join(', ');
+  }
+
+  /* Link packing: JSON -> deflate (when the browser supports it) -> base64url */
+
+  function bytesToBase64Url(bytes) {
+    let binary = '';
+    bytes.forEach((b) => { binary += String.fromCharCode(b); });
+    return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+
+  function base64UrlToBytes(text) {
+    const binary = atob(text.replace(/-/g, '+').replace(/_/g, '/'));
+    return Uint8Array.from(binary, (c) => c.charCodeAt(0));
+  }
+
+  async function pipeBytes(bytes, transform) {
+    const stream = new Blob([bytes]).stream().pipeThrough(transform);
+    return new Uint8Array(await new Response(stream).arrayBuffer());
+  }
+
+  async function packAnswers(data) {
+    const bytes = new TextEncoder().encode(JSON.stringify(data));
+    if ('CompressionStream' in window) {
+      return 'z' + bytesToBase64Url(await pipeBytes(bytes, new CompressionStream('deflate-raw'))) + END_MARK;
+    }
+    return 'p' + bytesToBase64Url(bytes) + END_MARK;
+  }
+
+  async function unpackAnswers(packed) {
+    if (!packed.endsWith(END_MARK)) throw new Error('truncated link');
+    const mode = packed[0];
+    let bytes = base64UrlToBytes(packed.slice(1, -1));
+    if (mode === 'z') bytes = await pipeBytes(bytes, new DecompressionStream('deflate-raw'));
+    else if (mode !== 'p') throw new Error('unknown link format');
+    return cleanAnswers(JSON.parse(new TextDecoder().decode(bytes)));
+  }
+
+  /* Draft storage: lets the client close the page and continue later on the same device */
+
+  function loadDraft() {
+    try {
+      return cleanAnswers(JSON.parse(localStorage.getItem(DRAFT_KEY)));
+    } catch {
+      return {};
+    }
+  }
+
+  function saveDraft() {
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(answers));
+    } catch {
+      // Private mode or blocked storage: the form still works, only resume is lost.
+    }
+  }
+
+  /* Form view */
+
+  function questionHeader(q) {
+    return [
+      el('p', { class: 'text', id: 'q' + q.id + '-text', textContent: q.text }),
+      q.hint && el('p', { class: 'hint', textContent: q.hint }),
+      q.image && el('img', { class: 'logo-preview', src: 'logo.svg', alt: 'Logo Ćatić Gambino' }),
+      q.facts && factsList(q.facts),
+    ];
+  }
+
+  function factsList(facts) {
+    const list = el('dl', { class: 'facts' });
+    facts.forEach(([name, value]) => list.append(el('dt', { textContent: name }), el('dd', { textContent: value })));
+    return list;
+  }
+
+  function optionGroup(q) {
+    const entry = answerFor(q.id);
+    const selected = entry.s || [];
+    const group = el('fieldset');
+    group.setAttribute('aria-labelledby', 'q' + q.id + '-text');
+
+    const otherField = el('textarea', {
+      id: 'q' + q.id + '-other',
+      rows: 2,
+      placeholder: 'Upiši svoj odgovor',
+      value: entry.d || '',
+      hidden: !selected.includes(otherIndex(q)),
+    });
+    otherField.setAttribute('aria-label', 'Upiši svoj odgovor za opciju Drugo');
+    otherField.addEventListener('input', () => {
+      answerFor(q.id).d = otherField.value;
+      onChange();
+    });
+
+    q.opts.forEach((label, index) => {
+      const input = el('input', {
+        type: q.type === 'radio' ? 'radio' : 'checkbox',
+        name: 'q' + q.id,
+        id: 'q' + q.id + '-opt' + index,
+        checked: selected.includes(index),
+      });
+      input.addEventListener('change', () => {
+        const checked = [...group.querySelectorAll('input:checked')].map((node) => Number(node.id.split('-opt')[1]));
+        answerFor(q.id).s = checked;
+        const otherOn = checked.includes(otherIndex(q));
+        otherField.hidden = !otherOn;
+        if (otherOn && label === OTHER) otherField.focus();
+        onChange();
+      });
+      group.append(el('label', { class: 'option', htmlFor: input.id }, input, el('span', { html: label })));
+    });
+    if (otherIndex(q) >= 0) group.append(otherField);
+    return group;
+  }
+
+  function openField(q) {
+    const field = el('textarea', {
+      id: 'q' + q.id + '-answer',
+      rows: 3,
+      placeholder: 'Upiši odgovor',
+      value: answerFor(q.id).t || '',
+    });
+    field.setAttribute('aria-labelledby', 'q' + q.id + '-text');
+    field.addEventListener('input', () => {
+      answerFor(q.id).t = field.value;
+      onChange();
+    });
+    return field;
+  }
+
+  function callToggle(q) {
+    const input = el('input', { type: 'checkbox', id: 'q' + q.id + '-call', checked: Boolean(answerFor(q.id).p) });
+    input.addEventListener('change', () => {
+      answerFor(q.id).p = input.checked ? 1 : 0;
+      onChange();
+    });
+    return el('label', { class: 'call', htmlFor: input.id }, input,
+      el('span', {}, el('b', { textContent: 'Poziv telefonom' }), el('small', { textContent: CALL_HINT })));
+  }
+
+  function questionBlock(q) {
+    return el('section', { class: 'question', id: 'block-' + q.id },
+      el('div', { class: 'num', textContent: q.label }),
+      el('div', { class: 'body' }, ...questionHeader(q), q.type === 'open' ? openField(q) : optionGroup(q), callToggle(q)));
+  }
+
+  function masthead(title) {
+    return el('header', { class: 'masthead' },
+      el('img', { src: 'logo.svg', alt: 'Logo Ćatić Gambino' }),
+      el('div', {}, el('div', { class: 'brand-name', textContent: 'Ćatić Gambino' }), el('h1', { textContent: title })));
+  }
+
+  function showForm(resumed) {
+    app.replaceChildren(
+      masthead('Upitnik za sajt'),
+      el('div', { class: 'intro' },
+        el('p', { textContent: 'Odgovori na pitanja koliko možeš. Ako ti neko pitanje nije jasno, označi "Poziv telefonom" ispod njega i proći ćemo ga zajedno.' }),
+        el('p', { textContent: 'Kad završiš, klikni "Sačuvaj odgovore" i pošalji mi link koji dobiješ.' }),
+        el('p', { class: 'note', textContent: resumed
+          ? 'Vratili smo odgovore koje si ranije upisao na ovom uređaju. Možeš da nastaviš gde si stao.'
+          : 'Možeš da zatvoriš stranicu i nastaviš kasnije na istom uređaju. Odgovori ostaju zapamćeni.' })),
+      el('div', { class: 'questions' }, ...MAIN_QUESTIONS.map(questionBlock)),
+      el('h2', { class: 'section-title', textContent: 'Dodatna pitanja' }),
+      el('div', { class: 'questions' }, ...EXTRA_QUESTIONS.map(questionBlock)));
+    saveBar.hidden = false;
+    updateProgress();
+    window.scrollTo(0, 0);
+  }
+
+  function onChange() {
+    saveDraft();
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const done = ALL_QUESTIONS.filter((q) => isAnswered(cleanAnswers(answers)[q.id])).length;
+    document.getElementById('progress-text').textContent = 'Odgovoreno ' + done + ' od ' + ALL_QUESTIONS.length;
+    document.getElementById('progress-fill').style.width = (done / ALL_QUESTIONS.length) * 100 + '%';
+  }
+
+  /* Save dialog */
+
+  async function openSaveDialog() {
+    const data = cleanAnswers(answers);
+    const link = location.origin + location.pathname + HASH_PREFIX + await packAnswers(data);
+    const missing = ALL_QUESTIONS.filter((q) => !isAnswered(data[q.id]));
+    document.getElementById('missing-note').textContent = missing.length
+      ? 'Bez odgovora: ' + refList(missing) + '. Možeš da se vratiš i dopuniš ih, pa ponovo klikni "Sačuvaj odgovore". Svaki put dobijaš novi link.'
+      : '';
+    document.getElementById('missing-note').hidden = !missing.length;
+    resultLink.value = link;
+    copyButton.textContent = 'Kopiraj link';
+    shareButton.hidden = !navigator.share;
+    saveDialog.showModal();
+    copyButton.focus();
+  }
+
+  async function copyLink() {
+    try {
+      await navigator.clipboard.writeText(resultLink.value);
+    } catch {
+      resultLink.select();
+      document.execCommand('copy');
+    }
+    copyButton.textContent = 'Link je kopiran';
+  }
+
+  async function shareLink() {
+    try {
+      await navigator.share({ title: 'Upitnik Ćatić Gambino', url: resultLink.value });
+    } catch {
+      // The client closed the share sheet: the link is still there to copy.
+    }
+  }
+
+  /* Answers view */
+
+  function answerBlock(q, entry) {
+    const body = el('div', { class: 'body' }, ...questionHeader(q));
+    if (!isAnswered(entry)) {
+      body.append(el('p', { class: 'empty', textContent: 'Bez odgovora' }));
+    } else {
+      const items = [];
+      (entry.s || []).forEach((index) => {
+        if (q.opts[index] === OTHER) {
+          items.push(el('li', {}, el('span', { class: 'other-label', textContent: OTHER + ': ' }), entry.d || '(nije upisano)'));
+        } else {
+          items.push(el('li', { html: q.opts[index] }));
+        }
+      });
+      if (entry.t) items.push(el('li', { textContent: entry.t }));
+      if (items.length) body.append(el('ul', { class: 'answer' }, ...items));
+      if (entry.p) body.append(el('div', { class: 'call-flag', textContent: 'Traži poziv telefonom' }));
+    }
+    return el('section', { class: 'question', id: 'block-' + q.id }, el('div', { class: 'num', textContent: q.label }), body);
+  }
+
+  function showAnswers(data) {
+    const callQuestions = ALL_QUESTIONS.filter((q) => data[q.id] && data[q.id].p);
+    const done = ALL_QUESTIONS.filter((q) => isAnswered(data[q.id])).length;
+
+    const callSummary = callQuestions.length
+      ? el('p', { class: 'call-summary' }, 'Poziv telefonom za pitanja: ', ...callQuestions.flatMap((q, i) => {
+          const jump = el('button', { type: 'button', class: 'inline-link', textContent: q.ref });
+          jump.addEventListener('click', () => document.getElementById('block-' + q.id).scrollIntoView());
+          return i ? [', ', jump] : [jump];
+        }))
+      : null;
+
+    const editButton = el('button', { type: 'button', class: 'secondary', textContent: 'Izmeni odgovore' });
+    editButton.addEventListener('click', () => {
+      answers = data;
+      saveDraft();
+      history.replaceState(null, '', location.pathname);
+      showForm(false);
+    });
+
+    app.replaceChildren(
+      masthead('Odgovori na upitnik'),
+      el('div', { class: 'summary' },
+        el('p', { textContent: 'Odgovoreno ' + done + ' od ' + ALL_QUESTIONS.length + '.' }),
+        callSummary,
+        el('div', { class: 'actions' }, editButton)),
+      el('div', { class: 'questions' }, ...MAIN_QUESTIONS.map((q) => answerBlock(q, data[q.id]))),
+      el('h2', { class: 'section-title', textContent: 'Dodatna pitanja' }),
+      el('div', { class: 'questions' }, ...EXTRA_QUESTIONS.map((q) => answerBlock(q, data[q.id]))));
+    saveBar.hidden = true;
+    window.scrollTo(0, 0);
+  }
+
+  function showBrokenLink() {
+    app.replaceChildren(
+      masthead('Upitnik za sajt'),
+      el('div', { class: 'error-box' },
+        el('h2', { textContent: 'Ovaj link nije ceo' }),
+        el('p', { textContent: 'Odgovori ne mogu da se pročitaju jer je deo linka izgubljen, verovatno pri slanju. Pošalji link ponovo, kao kopiran tekst ili mejlom.' }),
+        el('a', { class: 'button', href: location.pathname, textContent: 'Otvori upitnik' })));
+    saveBar.hidden = true;
+  }
+
+  /* Routing: a link with answers opens the read view, anything else opens the form */
+
+  async function route() {
+    if (location.hash.startsWith(HASH_PREFIX)) {
+      try {
+        showAnswers(await unpackAnswers(location.hash.slice(HASH_PREFIX.length)));
+      } catch {
+        showBrokenLink();
+      }
+      return;
+    }
+    answers = loadDraft();
+    showForm(Object.keys(answers).length > 0);
+  }
+
+  document.getElementById('save-button').addEventListener('click', openSaveDialog);
+  document.getElementById('close-button').addEventListener('click', () => saveDialog.close());
+  copyButton.addEventListener('click', copyLink);
+  shareButton.addEventListener('click', shareLink);
+  window.addEventListener('hashchange', route);
+  route();
+</script>
+</body>
+</html>
